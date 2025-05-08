@@ -9,4 +9,6 @@ plugins {
     alias(libs.plugins.hilt.android) apply false
     // KSP
     alias(libs.plugins.ksp) apply false
+    // Kapt
+    kotlin("kapt") version "2.1.20" apply false
 }

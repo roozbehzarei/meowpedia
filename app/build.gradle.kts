@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.hilt.android)
     // KSP
     alias(libs.plugins.ksp)
+    // Kapt
+    kotlin("kapt")
 }
 
 // Load properties from the key.properties file at the project root
@@ -64,12 +66,14 @@ android {
 dependencies {
     // Hilt
     implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    kapt(libs.hilt.compiler)
     // Retrofit
     implementation(libs.retrofit)
     // Moshi
     implementation(libs.converter.moshi)
     implementation(libs.moshi.kotlin)
+    ksp(libs.moshi.kotlin.codegen)
     // kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
     // Navigation
@@ -77,11 +81,17 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
     ksp(libs.androidx.room.compiler)
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
     // Mockk
     testImplementation(libs.mockk)
+    // Paging 3
+    implementation(libs.androidx.paging.compose)
+    // Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
