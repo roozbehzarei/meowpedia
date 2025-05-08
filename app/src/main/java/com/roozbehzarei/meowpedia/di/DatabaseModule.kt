@@ -2,7 +2,7 @@ package com.roozbehzarei.meowpedia.di
 
 import android.content.Context
 import androidx.room.Room
-import com.roozbehzarei.meowpedia.data.local.BreedDatabase
+import com.roozbehzarei.meowpedia.data.local.db.BreedDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +24,9 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideBreedDao(db: BreedDatabase) = db.breedDao()
+
+    @Provides
+    @Singleton
+    fun provideRemoteKeyDao(db: BreedDatabase) = db.remoteKeyDao()
+
 }
