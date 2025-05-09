@@ -1,15 +1,18 @@
 package com.roozbehzarei.meowpedia.data.remote.dto
 
-@com.squareup.moshi.JsonClass(generateAdapter = true)
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class BreedDto(
-    @com.squareup.moshi.Json(name = "id") val id: String,
-    @com.squareup.moshi.Json(name = "name") val name: String,
-    @com.squareup.moshi.Json(name = "temperament") val temperament: String,
-    @com.squareup.moshi.Json(name = "origin") val origin: String,
-    @com.squareup.moshi.Json(name = "description") val description: String,
-    @com.squareup.moshi.Json(name = "life_span") val lifeSpan: String,
-    @com.squareup.moshi.Json(name = "wikipedia_url") val wikipediaUrl: String?,
-    @com.squareup.moshi.Json(name = "reference_image_id") val imageId: String?,
+    @SerialName("id") val id: String,
+    @SerialName("name") val name: String,
+    @SerialName("temperament") val temperament: String,
+    @SerialName("origin") val origin: String,
+    @SerialName("description") val description: String,
+    @SerialName("life_span") val lifeSpan: String,
+    @SerialName("wikipedia_url") val wikipediaUrl: String? = null,
+    @SerialName("reference_image_id") val imageId: String? = null,
 ) {
     fun toBreedEntity(imageUrl: String?) = com.roozbehzarei.meowpedia.data.local.entity.BreedEntity(
         id = id,
