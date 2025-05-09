@@ -70,14 +70,11 @@ dependencies {
     kapt(libs.hilt.compiler)
     // Retrofit
     implementation(libs.retrofit)
-    // Moshi
-    implementation(libs.converter.moshi)
-    implementation(libs.moshi.kotlin)
-    ksp(libs.moshi.kotlin.codegen)
+    implementation(libs.converter.kotlinx.serialization)
     // kotlinx.serialization
     implementation(libs.kotlinx.serialization.json)
     // Navigation
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.navigation.compose)
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
