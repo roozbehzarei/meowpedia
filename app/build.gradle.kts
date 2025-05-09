@@ -89,6 +89,8 @@ dependencies {
     // Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    // Preferences DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.6")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

@@ -4,4 +4,10 @@
 
     <!-- Settings screen -->
     <string name="settings_title">Settings</string>
+    <string name="mode_light">Light</string>
+    <string name="mode_dark">Dark</string>
+    <string name="mode_default">System default</string>
+    <string name="theme">Theme</string>
+    <string name="dynamic_color">Dynamic Colors</string>
+    <string name="dynamic_color_desc">Adapt colors to match your device\'s wallpaper automatically</string>
 </resources>
