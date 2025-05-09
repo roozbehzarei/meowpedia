@@ -8,5 +8,6 @@ data class Breed(
     val description: String,
     val lifeSpan: String,
     val wikipediaUrl: String?,
+    val imageId: String?,
     val imageUrl: String?
 )

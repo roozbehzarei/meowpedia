@@ -20,6 +20,7 @@ data class BreedEntity(
         description = description,
         lifeSpan = lifeSpan,
         wikipediaUrl = wikipediaUrl,
+        imageId = imageId,
         imageUrl = imageUrl
     )
 }

@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +54,13 @@ fun MainScreen(
     val breeds = viewModel.breedPagingFlow.collectAsLazyPagingItems()
     var isBreedsListRefreshing by rememberSaveable { mutableStateOf(false) }
     var hasShownNetworkError by rememberSaveable { mutableStateOf(false) }
+    var imageToLoad by remember { mutableStateOf("") }
+
+    LaunchedEffect(imageToLoad) {
+        if (imageToLoad.isNotBlank()) {
+            viewModel.getBreedImage(imageToLoad)
+        }
+    }
 
     LaunchedEffect(breeds.loadState) {
         isBreedsListRefreshing = when (breeds.loadState.refresh) {
@@ -81,6 +89,7 @@ fun MainScreen(
         ) {
             items(breeds.itemCount) { index ->
                 breeds[index]?.let { breed ->
+                    if (breed.imageId != null && breed.imageUrl == null) imageToLoad = breed.imageId
                     BreedItem(
                         modifier = modifier.padding(horizontal = 8.dp),
                         id = breed.id,

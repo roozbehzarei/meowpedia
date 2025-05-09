@@ -12,10 +12,13 @@ interface BreedDao {
     @Upsert
     suspend fun upsertAll(breeds: List<BreedEntity>)
 
+    @Query("UPDATE breed SET image_id = :imageUrl WHERE reference_image_id = :imageKey")
+    suspend fun updateImage(imageKey: String, imageUrl: String)
+
     @Query("SELECT * FROM breed")
     fun pagingSource(): PagingSource<Int, BreedEntity>
 
     @Query("DELETE FROM breed")
-    fun clearAll()
+    suspend fun clearAll()
 
 }
