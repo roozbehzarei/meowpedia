@@ -18,7 +18,7 @@
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Meowpedia">
+            android:theme="@style/Theme.Meowpedia.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
