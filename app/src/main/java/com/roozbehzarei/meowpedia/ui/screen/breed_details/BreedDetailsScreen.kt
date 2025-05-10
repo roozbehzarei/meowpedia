@@ -1,6 +1,9 @@
 package com.roozbehzarei.meowpedia.ui.screen.breed_details
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,10 +34,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.roozbehzarei.meowpedia.BuildConfig
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
@@ -116,7 +121,7 @@ fun BreedDetailsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp), onClick = {
-                TODO()
+                uiState.breed?.wikipediaUrl?.let { launchUrl(context, it) }
             }) {
             Text(
                 text = "Read more on Wikipedia",
@@ -135,6 +140,17 @@ fun BreedDetailsScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+    }
+
+}
+
+private fun launchUrl(context: Context, url: String) {
+    val intent = CustomTabsIntent.Builder().build()
+    try {
+        intent.launchUrl(context, url.toUri())
+    } catch (e: Exception) {
+        Toast.makeText(context, "Can't load link", Toast.LENGTH_SHORT).show()
+        if (BuildConfig.DEBUG) e.printStackTrace()
     }
 
 }
