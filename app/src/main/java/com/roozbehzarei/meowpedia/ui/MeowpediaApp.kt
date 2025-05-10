@@ -31,15 +31,22 @@ fun MeowpediaApp(modifier: Modifier = Modifier) {
     // Find matching top-level destination for current route
     val snackbarHostState = SnackbarHostState()
     // Find matching top-level destination for current route
-    val currentDestination = when (backStackEntry?.destination?.route.orEmpty()) {
-        BreedDetailsRoute::class.qualifiedName -> TopLevelDestination.BreedDetails
-        SettingsRoute::class.qualifiedName -> TopLevelDestination.Settings
-        else -> TopLevelDestination.Main
+    val currentDestination = if (backStackEntry?.destination?.route.orEmpty()
+            .contains(BreedDetailsRoute::class.qualifiedName.orEmpty())
+    ) {
+        TopLevelDestination.BreedDetails
+    } else if (backStackEntry?.destination?.route.orEmpty()
+            .contains(SettingsRoute::class.qualifiedName.orEmpty())
+    ) {
+        TopLevelDestination.Settings
+    } else {
+        TopLevelDestination.Main
     }
 
     Scaffold(modifier, snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, topBar = {
         TopBar(
             title = stringResource(currentDestination.labelResource),
+            shouldShowActionItem = currentDestination == TopLevelDestination.Main,
             canNavigateUp = (currentDestination == TopLevelDestination.Main).not(),
             onNavigateUp = { navController.navigateUp() },
             onNavigateToSettings = { navController.navigate(TopLevelDestination.Settings.route) },
@@ -57,15 +64,18 @@ fun MeowpediaApp(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 private fun TopBar(
     title: String,
+    shouldShowActionItem: Boolean,
     canNavigateUp: Boolean,
     onNavigateUp: () -> Unit,
     onNavigateToSettings: () -> Unit,
 ) {
     CenterAlignedTopAppBar(title = { Text(title) }, actions = {
-        IconButton(
-            onClick = onNavigateToSettings
-        ) {
-            Icon(Icons.Filled.Settings, null)
+        if (shouldShowActionItem) {
+            IconButton(
+                onClick = onNavigateToSettings
+            ) {
+                Icon(Icons.Filled.Settings, null)
+            }
         }
     }, navigationIcon = {
         if (canNavigateUp) {
