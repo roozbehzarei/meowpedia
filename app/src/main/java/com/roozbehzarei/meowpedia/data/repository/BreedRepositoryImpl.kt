@@ -5,6 +5,8 @@ import com.roozbehzarei.meowpedia.data.local.db.BreedDatabase
 import com.roozbehzarei.meowpedia.data.remote.BreedApi
 import com.roozbehzarei.meowpedia.domain.model.Breed
 import com.roozbehzarei.meowpedia.domain.repository.BreedRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class BreedRepositoryImpl @Inject constructor(
@@ -18,8 +20,8 @@ class BreedRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBreedDetails(id: String): Breed {
-        return breedDatabase.breedDao().getById(id).toBreed()
+    override suspend fun getBreedDetails(id: String): Flow<Breed> {
+        return breedDatabase.breedDao().getById(id).map { it.toBreed() }
     }
 
     override suspend fun searchBreeds(query: String): List<Breed> {

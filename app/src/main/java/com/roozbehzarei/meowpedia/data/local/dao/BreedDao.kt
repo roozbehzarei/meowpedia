@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BreedDao {
@@ -41,7 +42,7 @@ interface BreedDao {
     )
 
     @Query("SELECT * FROM breed WHERE id = :id")
-    suspend fun getById(id: String): BreedEntity
+    fun getById(id: String): Flow<BreedEntity>
 
     @Query("SELECT * FROM breed WHERE id = :id")
     suspend fun getByIdOrNull(id: String): BreedEntity?

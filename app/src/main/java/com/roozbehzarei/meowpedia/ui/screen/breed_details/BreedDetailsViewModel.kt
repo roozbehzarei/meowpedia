@@ -8,6 +8,7 @@ import com.roozbehzarei.meowpedia.domain.repository.BreedRepository
 import com.roozbehzarei.meowpedia.domain.repository.FavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,11 +27,21 @@ class BreedDetailsViewModel @Inject constructor(
 
     fun getBreedDetails(id: String) {
         viewModelScope.launch {
-            try {
-                val breed = breedRepository.getBreedDetails(id)
+            val breedFlow = breedRepository.getBreedDetails(id)
+            breedFlow.collect { breed ->
                 _uiState.update { it.copy(breed = breed) }
-            } catch (e: Exception) {
-                if (BuildConfig.DEBUG) e.printStackTrace()
+            }
+        }
+    }
+
+    fun getBreedImage(key: String) {
+        viewModelScope.launch {
+            with(Dispatchers.IO) {
+                try {
+                    breedRepository.getImage(key)
+                } catch (e: Exception) {
+                    if (BuildConfig.DEBUG) e.printStackTrace()
+                }
             }
         }
     }

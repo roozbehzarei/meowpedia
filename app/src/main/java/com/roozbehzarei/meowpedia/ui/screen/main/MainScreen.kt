@@ -3,6 +3,7 @@ package com.roozbehzarei.meowpedia.ui.screen.main
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -90,7 +91,7 @@ fun MainScreen(
     }
 
     Column(modifier = modifier) {
-        BreedSearchField { input ->
+        BreedSearchField(enabled = ((breeds.loadState.refresh is LoadState.Error) && breeds.itemCount == 0).not()) { input ->
             viewModel.setSearchQuery(input)
         }
         if (breeds.loadState.refresh is LoadState.Error && breeds.itemCount == 0) {
@@ -183,10 +184,11 @@ private fun NetworkError(
     onRetryClicked: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.weight(1f))
         Text("There was an error fetching the list.", style = MaterialTheme.typography.titleMedium)
         Button(
             modifier = Modifier.padding(top = 8.dp), onClick = {
@@ -194,6 +196,7 @@ private fun NetworkError(
             }) {
             Text("Try again", style = MaterialTheme.typography.labelLarge)
         }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
@@ -266,9 +269,9 @@ private fun BreedItem(
 }
 
 @Composable
-private fun BreedSearchField(onInput: (input: String) -> Unit) {
+private fun BreedSearchField(enabled: Boolean, onInput: (input: String) -> Unit) {
 
-    var query by remember { mutableStateOf("") }
+    var query by rememberSaveable { mutableStateOf("") }
 
     TextField(
         modifier = Modifier
@@ -284,11 +287,13 @@ private fun BreedSearchField(onInput: (input: String) -> Unit) {
             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
 
         },
+        enabled = enabled,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
         ),
         shape = RoundedCornerShape(25.dp)
     )
@@ -297,7 +302,7 @@ private fun BreedSearchField(onInput: (input: String) -> Unit) {
 @Preview
 @Composable
 private fun BreedSearchFieldPreview() {
-    BreedSearchField {}
+    BreedSearchField(true) {}
 }
 
 @Preview

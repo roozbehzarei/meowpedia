@@ -59,6 +59,12 @@ fun BreedDetailsScreen(
         viewModel.getFavoriteItem(id)
     }
 
+    LaunchedEffect(uiState.breed) {
+        if (uiState.breed?.imageId != null && uiState.breed?.imageUrl == null) {
+            viewModel.getBreedImage(uiState.breed!!.imageId!!)
+        }
+    }
+
     LaunchedEffect(viewModel.updateFavoriteJob) {
         if (viewModel.updateFavoriteJob?.isCompleted == true) viewModel.getFavoriteItem(id)
     }
