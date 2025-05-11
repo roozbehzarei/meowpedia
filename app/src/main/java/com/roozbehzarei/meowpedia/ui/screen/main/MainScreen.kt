@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,6 +53,8 @@ fun MainScreen(
     onShowMessage: (message: String) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val favoriteItemIds = uiState.favoriteItems.filter { it.isFavorite == true }.map { it.id }
     val breeds = viewModel.breedPagingFlow.collectAsLazyPagingItems()
     var isBreedsListRefreshing by rememberSaveable { mutableStateOf(false) }
     var hasShownNetworkError by rememberSaveable { mutableStateOf(false) }
@@ -63,11 +67,7 @@ fun MainScreen(
     }
 
     LaunchedEffect(breeds.loadState) {
-        isBreedsListRefreshing = when (breeds.loadState.refresh) {
-            is LoadState.Loading -> true
-            is LoadState.NotLoading -> false
-            is LoadState.Error -> false
-        }
+        if ((breeds.loadState.refresh is LoadState.Loading).not()) isBreedsListRefreshing = false
         if (breeds.loadState.refresh is LoadState.Error && hasShownNetworkError.not()) {
             onShowMessage("A network error has occurred")
             hasShownNetworkError = true
@@ -77,6 +77,7 @@ fun MainScreen(
     PullToRefreshBox(
         isRefreshing = isBreedsListRefreshing,
         onRefresh = {
+            isBreedsListRefreshing = true
             hasShownNetworkError = false
             breeds.refresh()
         },
@@ -97,9 +98,11 @@ fun MainScreen(
                         name = breed.name,
                         origin = breed.origin,
                         temperament = breed.temperament,
-                        isFavorite = false,
+                        isFavorite = favoriteItemIds.contains(breed.id),
                         onClick = { id -> onBreedClicked(id) },
-                    )
+                        onFavoriteToggle = { id, isFavorite ->
+                            viewModel.updateFavoriteItem(id, isFavorite.not())
+                        })
                 }
             }
         }
@@ -117,6 +120,7 @@ private fun BreedItem(
     temperament: String,
     isFavorite: Boolean,
     onClick: (id: String) -> Unit,
+    onFavoriteToggle: (id: String, isFavorite: Boolean) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -161,11 +165,13 @@ private fun BreedItem(
                 )
             }
             IconButton(modifier = Modifier.padding(8.dp), onClick = {
-                // TODO
+                onFavoriteToggle(id, isFavorite)
             }) {
                 Icon(
-                    if (isFavorite) Icons.Default.Favorite
-                    else Icons.Default.FavoriteBorder, contentDescription = null
+                    imageVector = if (isFavorite) Icons.Default.Favorite
+                    else Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -183,5 +189,6 @@ private fun BreedItemPreview() {
         temperament = "Affectionate, Curious, Intelligent, Interactive, Lively, Playful, Social",
         origin = "United States",
         isFavorite = false,
-        onClick = {})
+        onClick = {},
+        onFavoriteToggle = { _, _ -> })
 }

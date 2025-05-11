@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +56,11 @@ fun BreedDetailsScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getBreedDetails(id)
+        viewModel.getFavoriteItem(id)
+    }
+
+    LaunchedEffect(viewModel.updateFavoriteJob) {
+        if (viewModel.updateFavoriteJob?.isCompleted == true) viewModel.getFavoriteItem(id)
     }
 
     Column(
@@ -82,8 +89,20 @@ fun BreedDetailsScreen(
                 text = uiState.breed?.name.orEmpty(),
                 style = MaterialTheme.typography.headlineSmall
             )
-            IconButton(onClick = { TODO() }) {
-                Icon(Icons.Default.FavoriteBorder, contentDescription = null)
+            IconButton(onClick = {
+                if (uiState.isFavorite == true) {
+                    viewModel.updateFavoriteItem(id, false)
+                } else {
+                    viewModel.updateFavoriteItem(id, true)
+                }
+            }) {
+                Icon(
+                    imageVector = if (uiState.isFavorite == true) Icons.Default.Favorite
+                    else Icons.Default.FavoriteBorder,
+                    contentDescription = null,
+                    tint = if (uiState.isFavorite == true) Color.Red
+                    else MaterialTheme.colorScheme.onSurface
+                )
             }
         }
         Spacer(Modifier.height(12.dp))

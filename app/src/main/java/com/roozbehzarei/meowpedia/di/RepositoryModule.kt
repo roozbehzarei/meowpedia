@@ -8,7 +8,9 @@ import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
 import com.roozbehzarei.meowpedia.data.remote.BreedApi
 import com.roozbehzarei.meowpedia.data.remote.BreedRemoteMediator
 import com.roozbehzarei.meowpedia.data.repository.BreedRepositoryImpl
+import com.roozbehzarei.meowpedia.data.repository.FavoriteRepositoryImpl
 import com.roozbehzarei.meowpedia.domain.repository.BreedRepository
+import com.roozbehzarei.meowpedia.domain.repository.FavoriteRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,6 +35,12 @@ object RepositoryModule {
     @Singleton
     fun provideBreedRepository(breedApi: BreedApi, breedDb: BreedDatabase): BreedRepository {
         return BreedRepositoryImpl(breedApi, breedDb)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoriteRepository(breedDb: BreedDatabase): FavoriteRepository {
+        return FavoriteRepositoryImpl(breedDb)
     }
 
 }

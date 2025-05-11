@@ -29,4 +29,8 @@ object DatabaseModule {
     @Singleton
     fun provideRemoteKeyDao(db: BreedDatabase) = db.remoteKeyDao()
 
+    @Provides
+    @Singleton
+    fun provideFavoriteDao(db: BreedDatabase) = db.favoriteDao()
+
 }
