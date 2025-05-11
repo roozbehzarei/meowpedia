@@ -18,4 +18,9 @@ interface BreedApi {
         @Path("key") imageKey: String
     ): BreedImageDto
 
+    @GET("v1/breeds/search")
+    suspend fun searchBreeds(
+        @Query("q") query: String
+    ): List<BreedDto>
+
 }

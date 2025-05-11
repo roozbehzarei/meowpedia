@@ -1,6 +1,5 @@
 package com.roozbehzarei.meowpedia.ui.screen.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -9,13 +8,17 @@ import androidx.paging.map
 import com.roozbehzarei.meowpedia.BuildConfig
 import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
 import com.roozbehzarei.meowpedia.domain.model.Favorite
+import com.roozbehzarei.meowpedia.domain.model.Search
 import com.roozbehzarei.meowpedia.domain.repository.BreedRepository
 import com.roozbehzarei.meowpedia.domain.repository.FavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,14 +31,20 @@ class MainViewModel @Inject constructor(
     private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainUiState(listOf()))
+    private val _uiState = MutableStateFlow(
+        MainUiState(
+            favoriteItems = listOf(), isSearchMode = false, search = Search(false, listOf())
+        )
+    )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+    private val searchQuery = MutableStateFlow<String>("")
     val breedPagingFlow = pager.flow.map { pagingData ->
         pagingData.map { it.toBreed() }
     }.cachedIn(viewModelScope)
 
     init {
         getFavorites()
+        fetchSearchResult()
     }
 
     fun getBreedImage(key: String) {
@@ -57,7 +66,6 @@ class MainViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(favoriteItems = favorite)
                 }
-                Log.d("ROUZ", uiState.value.favoriteItems.size.toString())
             }
         }
     }
@@ -66,6 +74,28 @@ class MainViewModel @Inject constructor(
         val favoriteItem = Favorite(id, isFavorite)
         viewModelScope.launch {
             favoriteRepository.updateFavorite(favoriteItem)
+        }
+    }
+
+    fun setSearchQuery(input: String) {
+        searchQuery.value = input
+        _uiState.update {
+            it.copy(
+                isSearchMode = input.isNotBlank(),
+                search = Search(isLoading = input.isNotBlank(), result = listOf())
+            )
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    fun fetchSearchResult() {
+        viewModelScope.launch {
+            searchQuery.debounce(500).distinctUntilChanged().collect {
+                if (it.isNotBlank()) {
+                    val breeds = breedRepository.searchBreeds(it)
+                    _uiState.update { it.copy(search = Search(isLoading = false, result = breeds)) }
+                }
+            }
         }
     }
 
