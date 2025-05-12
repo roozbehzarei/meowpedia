@@ -3,10 +3,12 @@ package com.roozbehzarei.meowpedia.di
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import com.roozbehzarei.meowpedia.data.local.dao.BreedDao
+import com.roozbehzarei.meowpedia.data.local.dao.FavoriteDao
 import com.roozbehzarei.meowpedia.data.local.db.BreedDatabase
 import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
 import com.roozbehzarei.meowpedia.data.remote.BreedApi
-import com.roozbehzarei.meowpedia.data.remote.BreedRemoteMediator
+import com.roozbehzarei.meowpedia.data.repository.BreedRemoteMediator
 import com.roozbehzarei.meowpedia.data.repository.BreedRepositoryImpl
 import com.roozbehzarei.meowpedia.data.repository.FavoriteRepositoryImpl
 import com.roozbehzarei.meowpedia.domain.repository.BreedRepository
@@ -50,25 +52,25 @@ object RepositoryModule {
      * Provides the [BreedRepository] implementation backed by network and local cache.
      *
      * @param breedApi Retrofit API for fetching breed data
-     * @param breedDb Room database for local data storage
+     * @param breedDao Data Access Object for accessing/modifying Breed entities
      * @return an instance of [BreedRepositoryImpl]
      */
     @Provides
     @Singleton
-    fun provideBreedRepository(breedApi: BreedApi, breedDb: BreedDatabase): BreedRepository {
-        return BreedRepositoryImpl(breedApi, breedDb)
+    fun provideBreedRepository(breedApi: BreedApi, breedDao: BreedDao): BreedRepository {
+        return BreedRepositoryImpl(breedApi, breedDao)
     }
 
     /**
      * Provides the [FavoriteRepository] for managing user's favorite breeds.
      *
-     * @param breedDb Room database containing favorites table
+     * @param favoriteDao Data Access Object for accessing/modifying favorite entities
      * @return an instance of [FavoriteRepositoryImpl]
      */
     @Provides
     @Singleton
-    fun provideFavoriteRepository(breedDb: BreedDatabase): FavoriteRepository {
-        return FavoriteRepositoryImpl(breedDb)
+    fun provideFavoriteRepository(favoriteDao: FavoriteDao): FavoriteRepository {
+        return FavoriteRepositoryImpl(favoriteDao)
     }
 
 }

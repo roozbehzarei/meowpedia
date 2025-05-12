@@ -1,7 +1,7 @@
 package com.roozbehzarei.meowpedia.data.repository
 
 import com.roozbehzarei.meowpedia.BuildConfig
-import com.roozbehzarei.meowpedia.data.local.db.BreedDatabase
+import com.roozbehzarei.meowpedia.data.local.dao.BreedDao
 import com.roozbehzarei.meowpedia.data.mapper.toBreed
 import com.roozbehzarei.meowpedia.data.remote.BreedApi
 import com.roozbehzarei.meowpedia.domain.model.Breed
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class BreedRepositoryImpl @Inject constructor(
-    private val breedApi: BreedApi, private val breedDatabase: BreedDatabase
+    private val breedApi: BreedApi, private val breedDao: BreedDao
 ) : BreedRepository {
 
     /**
@@ -23,7 +23,7 @@ class BreedRepositoryImpl @Inject constructor(
     override suspend fun getImage(key: String) {
         val image = breedApi.getBreedImage(key)
         image.url?.let { url ->
-            breedDatabase.breedDao().updateImage(image.id, url)
+            breedDao.updateImage(image.id, url)
         }
     }
 
@@ -35,34 +35,34 @@ class BreedRepositoryImpl @Inject constructor(
      * @return Flow stream of [Breed] domain models
      */
     override suspend fun getBreedDetails(id: String): Flow<Breed> {
-        return breedDatabase.breedDao().getById(id).map { it.toBreed() }
+        return breedDao.getById(id).map { it.toBreed() }
     }
 
     /**
-     * Searches for breeds matching the [query].
+     * Searches for breeds matching the [name].
      *
      * Performs a network search to fetch the latest breed data,
      * updates or inserts entries in the local database, and then
-     * returns the cached results filtered by [query].
+     * returns the cached results filtered by [name].
      *
      * In case of network errors, it falls back to the local search results.
      *
-     * @param query Text to filter breeds by name or attributes
+     * @param name Text to filter breeds by name
      * @return List of [Breed] domain models matching the query
      */
-    override suspend fun searchBreeds(query: String): List<Breed> {
+    override suspend fun searchBreeds(name: String): List<Breed> {
         try {
             // Fetch remote breed list matching the query
-            val fetchedBreeds = breedApi.searchBreeds(query)
+            val fetchedBreeds = breedApi.searchBreeds(name)
             fetchedBreeds.forEach { breed ->
                 // Check if the breed already exists locally
-                val existingBreedEntity = breedDatabase.breedDao().getByIdOrNull(breed.id)
+                val existingBreedEntity = breedDao.getByIdOrNull(breed.id)
                 if (existingBreedEntity == null) {
                     // Insert new breed entity if not present
-                    breedDatabase.breedDao().insert(breed.toBreedEntity(null))
+                    breedDao.insert(breed.toBreedEntity(null))
                 } else {
                     // Update fields of existing entity
-                    breedDatabase.breedDao().update(
+                    breedDao.update(
                         id = breed.id,
                         name = breed.name,
                         temperament = breed.temperament,
@@ -76,14 +76,14 @@ class BreedRepositoryImpl @Inject constructor(
                 // If a new imageId exists and no URL is cached, fetch and update
                 if (breed.imageId != null && existingBreedEntity?.imageUrl == null) {
                     val breedImageUrl = breedApi.getBreedImage(breed.imageId)
-                    breedDatabase.breedDao().updateImage(breedImageUrl.id, breedImageUrl.url!!)
+                    breedDao.updateImage(breedImageUrl.id, breedImageUrl.url!!)
                 }
             }
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) e.printStackTrace()
         }
         // Always return local search results; updated or cached
-        return breedDatabase.breedDao().searchBreeds(query).map { it.toBreed() }
+        return breedDao.searchBreeds(name).map { it.toBreed() }
     }
 
 }

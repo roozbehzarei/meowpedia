@@ -1,6 +1,6 @@
 package com.roozbehzarei.meowpedia.data.repository
 
-import com.roozbehzarei.meowpedia.data.local.db.BreedDatabase
+import com.roozbehzarei.meowpedia.data.local.dao.FavoriteDao
 import com.roozbehzarei.meowpedia.data.mapper.toEntity
 import com.roozbehzarei.meowpedia.data.mapper.toFavorite
 import com.roozbehzarei.meowpedia.domain.model.Favorite
@@ -14,24 +14,24 @@ import javax.inject.Inject
  *
  * This class provides methods to interact with favorite breed data stored in the local database.
  *
- * @property breedDatabase The database instance used to access favorite breed.
+ * @property favoriteDao The Data Access Object used to access favorite breed.
  */
 class FavoriteRepositoryImpl @Inject constructor(
-    private val breedDatabase: BreedDatabase
+    private val favoriteDao: FavoriteDao
 ) : FavoriteRepository {
 
     override suspend fun getAllFavorites(): Flow<List<Favorite>> {
-        return breedDatabase.favoriteDao().getAll().map { entities ->
+        return favoriteDao.getAll().map { entities ->
             entities.map { it.toFavorite() }
         }
     }
 
     override suspend fun getFavorite(id: String): Favorite? {
-        return breedDatabase.favoriteDao().getByIdOrNull(id)?.toFavorite()
+        return favoriteDao.getByIdOrNull(id)?.toFavorite()
     }
 
     override suspend fun updateFavorite(favorite: Favorite) {
-        breedDatabase.favoriteDao().upsert(favorite.toEntity())
+        favoriteDao.upsert(favorite.toEntity())
     }
 
 }
