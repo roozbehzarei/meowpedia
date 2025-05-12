@@ -14,6 +14,12 @@ class BreedRepositoryImpl @Inject constructor(
     private val breedApi: BreedApi, private val breedDatabase: BreedDatabase
 ) : BreedRepository {
 
+    /**
+     * Fetches the image associated with the given [key] (image id) from the network,
+     * and updates the locally cached BreedEntity with the new image URL.
+     *
+     * @param key Unique identifier of the breed image
+     */
     override suspend fun getImage(key: String) {
         val image = breedApi.getBreedImage(key)
         image.url?.let { url ->
@@ -21,18 +27,41 @@ class BreedRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Returns a [Flow] emitting breed details for the given [id].
+     * The flow automatically emits updates whenever the local database entry changes.
+     *
+     * @param id Unique identifier of the breed
+     * @return Flow stream of [Breed] domain models
+     */
     override suspend fun getBreedDetails(id: String): Flow<Breed> {
         return breedDatabase.breedDao().getById(id).map { it.toBreed() }
     }
 
+    /**
+     * Searches for breeds matching the [query].
+     *
+     * Performs a network search to fetch the latest breed data,
+     * updates or inserts entries in the local database, and then
+     * returns the cached results filtered by [query].
+     *
+     * In case of network errors, it falls back to the local search results.
+     *
+     * @param query Text to filter breeds by name or attributes
+     * @return List of [Breed] domain models matching the query
+     */
     override suspend fun searchBreeds(query: String): List<Breed> {
         try {
+            // Fetch remote breed list matching the query
             val fetchedBreeds = breedApi.searchBreeds(query)
             fetchedBreeds.forEach { breed ->
+                // Check if the breed already exists locally
                 val existingBreedEntity = breedDatabase.breedDao().getByIdOrNull(breed.id)
                 if (existingBreedEntity == null) {
+                    // Insert new breed entity if not present
                     breedDatabase.breedDao().insert(breed.toBreedEntity(null))
                 } else {
+                    // Update fields of existing entity
                     breedDatabase.breedDao().update(
                         id = breed.id,
                         name = breed.name,
@@ -44,6 +73,7 @@ class BreedRepositoryImpl @Inject constructor(
                         imageId = breed.imageId
                     )
                 }
+                // If a new imageId exists and no URL is cached, fetch and update
                 if (breed.imageId != null && existingBreedEntity?.imageUrl == null) {
                     val breedImageUrl = breedApi.getBreedImage(breed.imageId)
                     breedDatabase.breedDao().updateImage(breedImageUrl.id, breedImageUrl.url!!)
@@ -52,8 +82,8 @@ class BreedRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) e.printStackTrace()
         }
-        val x = breedDatabase.breedDao().searchBreeds(query).map { it.toBreed() }
-        return x
+        // Always return local search results; updated or cached
+        return breedDatabase.breedDao().searchBreeds(query).map { it.toBreed() }
     }
 
 }

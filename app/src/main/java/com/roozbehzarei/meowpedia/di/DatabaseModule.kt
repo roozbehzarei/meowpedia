@@ -10,6 +10,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Hilt module for providing database related dependencies.
+ * It is installed in the [SingletonComponent], ensuring that the provided dependencies are
+ * singleton instances throughout the application's lifecycle.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {

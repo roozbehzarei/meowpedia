@@ -7,6 +7,10 @@ import androidx.room.Upsert
 import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data Access Object for the Breed entity.
+ * Provide methods to interact with the local breed data stored in the database.
+ */
 @Dao
 interface BreedDao {
 

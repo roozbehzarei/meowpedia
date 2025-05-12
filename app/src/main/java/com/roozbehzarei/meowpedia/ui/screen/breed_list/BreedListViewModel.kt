@@ -25,6 +25,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel for the breed list screen, handling paging, search, and favorites.
+ *
+ * @property pager Paging source for breed entities, provided by Hilt.
+ * @property breedRepository Repository for fetching breed data and images.
+ * @property favoriteRepository Repository for managing favorite breeds.
+ */
 @HiltViewModel
 class BreedListViewModel @Inject constructor(
     pager: Pager<Int, BreedEntity>,
@@ -38,16 +45,25 @@ class BreedListViewModel @Inject constructor(
         )
     )
     val uiState: StateFlow<BreedListUiState> = _uiState.asStateFlow()
+    // Track the current search query text
     private val searchQuery = MutableStateFlow<String>("")
+    // Flow of paged breed data mapped to domain models and cached in ViewModel scope
     val breedPagingFlow = pager.flow.map { pagingData ->
         pagingData.map { it.toBreed() }
     }.cachedIn(viewModelScope)
 
     init {
+        // Fetch favorite breeds
         getFavorites()
+        // Initialize search result observation
         fetchSearchResult()
     }
 
+    /**
+     * Fetches and caches an image for the given breed [key] asynchronously.
+     *
+     * @param key Identifier for the breed image.
+     */
     fun getBreedImage(key: String) {
         viewModelScope.launch {
             with(Dispatchers.IO) {
@@ -60,6 +76,9 @@ class BreedListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Collects all favorite items from repository and updates UI state.
+     */
     private fun getFavorites() {
         viewModelScope.launch {
             val favorites = favoriteRepository.getAllFavorites()
@@ -71,6 +90,12 @@ class BreedListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Updates favorite status for a breed.
+     *
+     * @param id Unique identifier of the breed.
+     * @param isFavorite `true` to mark as favorite, `false` to unfavorite.
+     */
     fun updateFavoriteItem(id: String, isFavorite: Boolean) {
         val favoriteItem = Favorite(id, isFavorite)
         viewModelScope.launch {
@@ -78,6 +103,13 @@ class BreedListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Sets the current search query.
+     *
+     * Also activates search mode and sets search status to `isLoading` if input is not blank.
+     *
+     * @param input Text input for search query.
+     */
     fun setSearchQuery(input: String) {
         searchQuery.value = input
         _uiState.update {
@@ -88,6 +120,14 @@ class BreedListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Observes search query changes, applies a 500ms debounce to limit unnecessary calls,
+     * ignores consecutive identical inputs, and performs the search when the query is non-blank.
+     *
+     * Upon receiving results, updates the UI state to reflect the search completion and display results.
+     *
+     * @see BreedRepository.searchBreeds
+     */
     @OptIn(FlowPreview::class)
     fun fetchSearchResult() {
         viewModelScope.launch {

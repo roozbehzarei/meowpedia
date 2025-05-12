@@ -13,6 +13,13 @@ import com.roozbehzarei.meowpedia.ui.screen.breed_list.MainScreen
 import com.roozbehzarei.meowpedia.ui.screen.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
+/**
+ * Provides the navigation graph for the Meowpedia application.
+ *
+ * @param modifier The modifier to be applied to the NavHost.
+ * @param navController The NavHostController responsible for managing navigation.
+ * @param snackbarHostState The SnackbarHostState used for showing messages.
+ */
 @Composable
 fun MeowpediaNavHost(
     modifier: Modifier = Modifier,

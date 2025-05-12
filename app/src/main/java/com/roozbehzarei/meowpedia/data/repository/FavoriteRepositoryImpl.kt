@@ -9,6 +9,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+/**
+ * Implementation of the [FavoriteRepository] interface.
+ *
+ * This class provides methods to interact with favorite breed data stored in the local database.
+ *
+ * @property breedDatabase The database instance used to access favorite breed.
+ */
 class FavoriteRepositoryImpl @Inject constructor(
     private val breedDatabase: BreedDatabase
 ) : FavoriteRepository {

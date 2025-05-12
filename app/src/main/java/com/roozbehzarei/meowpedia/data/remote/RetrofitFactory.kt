@@ -6,6 +6,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
+/**
+ * A factory object for creating a Retrofit instance for The Cat API.
+ */
 object RetrofitFactory {
 
     private const val BASE_URL = "https://api.thecatapi.com/"

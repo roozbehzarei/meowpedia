@@ -11,6 +11,12 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
+/**
+ * Hilt module responsible for providing network-related dependencies.
+ *
+ * Installed in the [SingletonComponent], ensuring that provided instances
+ * live as long as the application.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {

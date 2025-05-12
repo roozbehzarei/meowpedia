@@ -9,6 +9,9 @@ import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
 import com.roozbehzarei.meowpedia.data.local.entity.FavoriteEntity
 import com.roozbehzarei.meowpedia.data.local.entity.RemoteKeyEntity
 
+/**
+ * Room database for storing breed information, remote keys for pagination, and favorite breeds.
+ */
 @Database(
     entities = [BreedEntity::class, RemoteKeyEntity::class, FavoriteEntity::class],
     version = 1

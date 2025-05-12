@@ -6,6 +6,9 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * Retrofit interface for interacting with The Cat API.
+ */
 interface BreedApi {
 
     @GET("v1/breeds")

@@ -56,6 +56,13 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.roozbehzarei.meowpedia.R
 
+/**
+ * Main screen displaying a list of cat breeds with search, pull-to-refresh,
+ * and favorite functionality.
+ *
+ * @param onBreedClicked Callback when a breed item is tapped, passing the breed ID.
+ * @param onShowMessage Callback for displaying snackbar messages.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -68,22 +75,27 @@ fun MainScreen(
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    // Track favorite IDs for quick lookup
     val favoriteItemIds = uiState.favoriteItems.filter { it.isFavorite == true }.map { it.id }
     val breeds = viewModel.breedPagingFlow.collectAsLazyPagingItems()
+    // Local state for manual refresh indicator and error snackbar flag
     var isManuallyRefreshingList by rememberSaveable { mutableStateOf(false) }
     var hasShownNetworkError by rememberSaveable { mutableStateOf(false) }
     var imageToLoad by remember { mutableStateOf("") }
 
+    // Clear focus when user scrolls to dismiss keyboard
     LaunchedEffect(lazyListState.isScrollInProgress) {
         focusManager.clearFocus()
     }
 
+    // Trigger image fetch when imageToLoad is set
     LaunchedEffect(imageToLoad) {
         if (imageToLoad.isNotBlank()) {
             viewModel.getBreedImage(imageToLoad)
         }
     }
 
+    // Handle loading and error states for initial load
     LaunchedEffect(breeds.loadState) {
         if ((breeds.loadState.refresh is LoadState.Loading).not()) isManuallyRefreshingList = false
         if (breeds.loadState.refresh is LoadState.Error && hasShownNetworkError.not()) {
@@ -93,6 +105,7 @@ fun MainScreen(
     }
 
     Column(modifier = modifier) {
+        // Disabled when there's no data, local and remote
         BreedSearchField(enabled = ((breeds.loadState.refresh is LoadState.Error) && breeds.itemCount == 0).not()) { input ->
             viewModel.setSearchQuery(input)
         }
@@ -100,6 +113,7 @@ fun MainScreen(
             NetworkError {
                 breeds.refresh()
             }
+            // Show full-screen loader on first load
         } else if (breeds.loadState.refresh is LoadState.Loading && breeds.itemCount == 0) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -125,7 +139,9 @@ fun MainScreen(
                     state = lazyListState
                 ) {
                     if (uiState.isSearchMode) {
+                        // Display search results
                         if (uiState.search.isLoading) {
+                            // Show loader while waiting for result
                             item {
                                 CircularProgressIndicator()
                             }
@@ -154,6 +170,7 @@ fun MainScreen(
                             }
                         }
                     } else {
+                        // Display paged list
                         items(breeds.itemCount) { index ->
                             breeds[index]?.let { breed ->
                                 if (breed.imageId != null && breed.imageUrl == null) imageToLoad =
@@ -178,9 +195,15 @@ fun MainScreen(
         }
     }
 
-
 }
 
+/**
+ * Full-screen error UI shown when the local cache contains no items and the network fetch fails.
+ *
+ * This typically occurs on first launch without connectivity.
+ *
+ * @param onRetryClicked Lambda invoked when the user taps the retry button.
+ */
 @Composable
 private fun NetworkError(
     onRetryClicked: () -> Unit
@@ -208,6 +231,9 @@ private fun NetworkError(
     }
 }
 
+/**
+ * Reusable composable for displaying a breed item in the list.
+ */
 @Composable
 private fun BreedItem(
     modifier: Modifier = Modifier,

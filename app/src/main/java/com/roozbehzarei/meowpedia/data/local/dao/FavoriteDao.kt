@@ -6,6 +6,12 @@ import androidx.room.Upsert
 import com.roozbehzarei.meowpedia.data.local.entity.FavoriteEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Data Access Object (DAO) for managing favorite cat entities in the local database.
+ *
+ * Provide methods for interacting with the `favorite` table, allowing for
+ * retrieving, inserting, and updating favorite breeds.
+ */
 @Dao
 interface FavoriteDao {
 

@@ -17,11 +17,26 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Hilt module providing repository and paging dependencies.
+ *
+ * Installed in [SingletonComponent] for application-wide singletons.
+ */
 @OptIn(ExperimentalPagingApi::class)
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
+    /**
+     * Provides a [Pager] that loads [BreedEntity] pages from network and database.
+     *
+     * Uses [BreedRemoteMediator] to synchronize remote data and local cache,
+     * and a Room paging source for local queries.
+     *
+     * @param breedApi Retrofit interface for breed endpoints
+     * @param breedDb Room database instance containing breed DAO
+     * @return configured Pager for paging breed entities
+     */
     @Provides
     @Singleton
     fun provideBreedPager(breedApi: BreedApi, breedDb: BreedDatabase): Pager<Int, BreedEntity> {
@@ -31,12 +46,25 @@ object RepositoryModule {
             ), pagingSourceFactory = { breedDb.breedDao().pagingSource() })
     }
 
+    /**
+     * Provides the [BreedRepository] implementation backed by network and local cache.
+     *
+     * @param breedApi Retrofit API for fetching breed data
+     * @param breedDb Room database for local data storage
+     * @return an instance of [BreedRepositoryImpl]
+     */
     @Provides
     @Singleton
     fun provideBreedRepository(breedApi: BreedApi, breedDb: BreedDatabase): BreedRepository {
         return BreedRepositoryImpl(breedApi, breedDb)
     }
 
+    /**
+     * Provides the [FavoriteRepository] for managing user's favorite breeds.
+     *
+     * @param breedDb Room database containing favorites table
+     * @return an instance of [FavoriteRepositoryImpl]
+     */
     @Provides
     @Singleton
     fun provideFavoriteRepository(breedDb: BreedDatabase): FavoriteRepository {

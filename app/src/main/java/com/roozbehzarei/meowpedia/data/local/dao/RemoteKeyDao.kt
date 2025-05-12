@@ -6,6 +6,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.roozbehzarei.meowpedia.data.local.entity.RemoteKeyEntity
 
+/**
+ * Data Access Object (DAO) for managing [RemoteKeyEntity] instances in the database.
+ *
+ * Provide methods for inserting, retrieving, and deleting RemoteKeyEntity objects,
+ * which are used to track pagination information for The Cat API.
+ */
 @Dao
 interface RemoteKeyDao {
 

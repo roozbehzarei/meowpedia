@@ -45,6 +45,17 @@ import coil3.request.crossfade
 import com.roozbehzarei.meowpedia.BuildConfig
 import com.roozbehzarei.meowpedia.R
 
+/**
+ * Displays detailed information for a specific cat breed, including image, name,
+ * lifespan, origin, description.
+ *
+ * Fetches data via [BreedDetailsViewModel] and reacts to preference and
+ * network states using Compose state and side-effects.
+ *
+ * @param modifier Optional [Modifier] for styling and layout adjustments
+ * @param id Unique identifier of the breed to display
+ * @param viewModel [BreedDetailsViewModel] injected via Hilt
+ */
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun BreedDetailsScreen(
@@ -56,17 +67,20 @@ fun BreedDetailsScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
 
+    // On first composition, load breed details and favorite status
     LaunchedEffect(Unit) {
         viewModel.getBreedDetails(id)
         viewModel.getFavoriteItem(id)
     }
 
+    // When breed data loads with an imageId but no URL, fetch the image
     LaunchedEffect(uiState.breed) {
         if (uiState.breed?.imageId != null && uiState.breed?.imageUrl == null) {
             viewModel.getBreedImage(uiState.breed!!.imageId!!)
         }
     }
 
+    // Refresh favorite status after each toggle favorite operation
     LaunchedEffect(viewModel.updateFavoriteJob) {
         if (viewModel.updateFavoriteJob?.isCompleted == true) viewModel.getFavoriteItem(id)
     }
@@ -76,6 +90,7 @@ fun BreedDetailsScreen(
             .padding(horizontal = 8.dp)
             .verticalScroll(rememberScrollState())
     ) {
+        // Breed image with dynamic height (1/3 of screen)
         AsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
@@ -171,6 +186,12 @@ fun BreedDetailsScreen(
 
 }
 
+/**
+ * Opens the given [url] in a Chrome Custom Tab.
+ *
+ * @param context Context used to launch the intent and show toast
+ * @param url Full URL string to open
+ */
 private fun launchUrl(context: Context, url: String) {
     val intent = CustomTabsIntent.Builder().build()
     try {
