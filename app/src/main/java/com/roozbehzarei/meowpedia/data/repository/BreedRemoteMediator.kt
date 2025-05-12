@@ -1,4 +1,4 @@
-package com.roozbehzarei.meowpedia.data.remote
+package com.roozbehzarei.meowpedia.data.repository
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -8,6 +8,7 @@ import androidx.room.withTransaction
 import com.roozbehzarei.meowpedia.data.local.db.BreedDatabase
 import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
 import com.roozbehzarei.meowpedia.data.local.entity.RemoteKeyEntity
+import com.roozbehzarei.meowpedia.data.remote.BreedApi
 
 private const val REMOTE_KEY_ID = "breed_remote_key"
 
@@ -34,7 +35,7 @@ class BreedRemoteMediator(
      *
      * @param loadType Type of load operation (REFRESH, PREPEND, APPEND)
      * @param state Paging state containing page size and loaded pages
-     * @return [MediatorResult] indicating success or error and end-of-pagination state
+     * @return `MediatorResult` indicating success or error and end-of-pagination state
      */
     override suspend fun load(
         loadType: LoadType, state: PagingState<Int, BreedEntity>
