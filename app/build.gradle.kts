@@ -16,12 +16,13 @@ plugins {
 }
 
 // Load properties from the key.properties file at the project root
-val keyProperties = Properties().apply {
-    val keyPropertiesFile = rootProject.file("key.properties")
-    if (keyPropertiesFile.exists()) {
-        load(FileInputStream(keyPropertiesFile))
+val keyProperties =
+    Properties().apply {
+        val keyPropertiesFile = rootProject.file("key.properties")
+        if (keyPropertiesFile.exists()) {
+            load(FileInputStream(keyPropertiesFile))
+        }
     }
-}
 
 // Retrieve The Cat API key from key.properties file
 val catApiKey = keyProperties["CAT_API_KEY"] as String
@@ -46,7 +47,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
             )
         }
     }
@@ -90,7 +92,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     // Preferences DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.6")
+    implementation(libs.androidx.datastore.preferences)
     // Custom Tab
     implementation(libs.androidx.browser)
 

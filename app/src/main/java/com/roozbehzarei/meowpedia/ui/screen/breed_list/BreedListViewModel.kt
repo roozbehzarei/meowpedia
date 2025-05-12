@@ -1,4 +1,4 @@
-package com.roozbehzarei.meowpedia.ui.screen.main
+package com.roozbehzarei.meowpedia.ui.screen.breed_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.roozbehzarei.meowpedia.BuildConfig
 import com.roozbehzarei.meowpedia.data.local.entity.BreedEntity
+import com.roozbehzarei.meowpedia.data.mapper.toBreed
 import com.roozbehzarei.meowpedia.domain.model.Favorite
 import com.roozbehzarei.meowpedia.domain.model.Search
 import com.roozbehzarei.meowpedia.domain.repository.BreedRepository
@@ -25,18 +26,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class BreedListViewModel @Inject constructor(
     pager: Pager<Int, BreedEntity>,
     private val breedRepository: BreedRepository,
     private val favoriteRepository: FavoriteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        MainUiState(
+        BreedListUiState(
             favoriteItems = listOf(), isSearchMode = false, search = Search(false, listOf())
         )
     )
-    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<BreedListUiState> = _uiState.asStateFlow()
     private val searchQuery = MutableStateFlow<String>("")
     val breedPagingFlow = pager.flow.map { pagingData ->
         pagingData.map { it.toBreed() }

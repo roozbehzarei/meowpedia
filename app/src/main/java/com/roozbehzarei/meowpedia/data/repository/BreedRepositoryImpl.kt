@@ -2,6 +2,7 @@ package com.roozbehzarei.meowpedia.data.repository
 
 import com.roozbehzarei.meowpedia.BuildConfig
 import com.roozbehzarei.meowpedia.data.local.db.BreedDatabase
+import com.roozbehzarei.meowpedia.data.mapper.toBreed
 import com.roozbehzarei.meowpedia.data.remote.BreedApi
 import com.roozbehzarei.meowpedia.domain.model.Breed
 import com.roozbehzarei.meowpedia.domain.repository.BreedRepository

@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -42,6 +43,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.roozbehzarei.meowpedia.BuildConfig
+import com.roozbehzarei.meowpedia.R
 
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
@@ -115,13 +117,13 @@ fun BreedDetailsScreen(
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Lifespan",
+                text = stringResource(R.string.lifespan),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Origin",
+                text = stringResource(R.string.origin),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
@@ -130,7 +132,7 @@ fun BreedDetailsScreen(
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "${uiState.breed?.lifeSpan.orEmpty()} years",
+                text = stringResource(R.string.year_unit, uiState.breed?.lifeSpan.orEmpty()),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
@@ -149,7 +151,7 @@ fun BreedDetailsScreen(
                 uiState.breed?.wikipediaUrl?.let { launchUrl(context, it) }
             }) {
             Text(
-                text = "Read more on Wikipedia",
+                text = stringResource(R.string.wikipedia_button),
                 style = MaterialTheme.typography.labelMedium,
                 textAlign = TextAlign.Center
             )
@@ -174,7 +176,7 @@ private fun launchUrl(context: Context, url: String) {
     try {
         intent.launchUrl(context, url.toUri())
     } catch (e: Exception) {
-        Toast.makeText(context, "Can't load link", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.link_error), Toast.LENGTH_SHORT).show()
         if (BuildConfig.DEBUG) e.printStackTrace()
     }
 

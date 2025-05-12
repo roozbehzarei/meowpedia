@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.roozbehzarei.meowpedia.ui.screen.breed_details.BreedDetailsScreen
-import com.roozbehzarei.meowpedia.ui.screen.main.MainScreen
+import com.roozbehzarei.meowpedia.ui.screen.breed_list.MainScreen
 import com.roozbehzarei.meowpedia.ui.screen.settings.SettingsScreen
 import kotlinx.coroutines.launch
 

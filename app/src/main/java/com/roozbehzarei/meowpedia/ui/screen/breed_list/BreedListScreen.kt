@@ -1,4 +1,4 @@
-package com.roozbehzarei.meowpedia.ui.screen.main
+package com.roozbehzarei.meowpedia.ui.screen.breed_list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,6 +44,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,10 +62,11 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     onBreedClicked: (id: String) -> Unit,
     onShowMessage: (message: String) -> Unit,
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: BreedListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val favoriteItemIds = uiState.favoriteItems.filter { it.isFavorite == true }.map { it.id }
     val breeds = viewModel.breedPagingFlow.collectAsLazyPagingItems()
@@ -85,7 +87,7 @@ fun MainScreen(
     LaunchedEffect(breeds.loadState) {
         if ((breeds.loadState.refresh is LoadState.Loading).not()) isManuallyRefreshingList = false
         if (breeds.loadState.refresh is LoadState.Error && hasShownNetworkError.not()) {
-            onShowMessage("A network error has occurred")
+            onShowMessage(context.getString(R.string.network_error_snackbar))
             hasShownNetworkError = true
         }
     }
@@ -129,7 +131,7 @@ fun MainScreen(
                             }
                         } else if (uiState.search.isLoading.not() && uiState.search.result.isEmpty()) item {
                             Text(
-                                "Could not find any breeds matching your criteria.",
+                                text = stringResource(R.string.search_error),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
@@ -189,12 +191,18 @@ private fun NetworkError(
         verticalArrangement = Arrangement.Center
     ) {
         Spacer(modifier = Modifier.weight(1f))
-        Text("There was an error fetching the list.", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = stringResource(R.string.fetch_list_error),
+            style = MaterialTheme.typography.titleMedium
+        )
         Button(
             modifier = Modifier.padding(top = 8.dp), onClick = {
                 onRetryClicked()
             }) {
-            Text("Try again", style = MaterialTheme.typography.labelLarge)
+            Text(
+                text = stringResource(R.string.retry_button),
+                style = MaterialTheme.typography.labelLarge
+            )
         }
         Spacer(modifier = Modifier.weight(1f))
     }
@@ -242,13 +250,13 @@ private fun BreedItem(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "Origin: $origin",
+                    text = stringResource(R.string.origin_key, origin),
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    "Temperament: $temperament",
+                    text = stringResource(R.string.temperament_key, temperament),
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -282,7 +290,12 @@ private fun BreedSearchField(enabled: Boolean, onInput: (input: String) -> Unit)
             query = it
             onInput(query)
         },
-        label = { Text(text = " Search breed") },
+        label = {
+            Text(
+                text = stringResource(R.string.breed_search_field),
+                style = MaterialTheme.typography.labelLarge
+            )
+        },
         trailingIcon = {
             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
 

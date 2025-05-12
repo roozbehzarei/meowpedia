@@ -2,6 +2,22 @@
     <string name="app_name">Meowpedia</string>
     <string name="empty" />
 
+    <!-- Breed details screen -->
+    <string name="lifespan">Lifespan</string>
+    <string name="origin">Origin</string>
+    <string name="year_unit">%1$s years</string>
+    <string name="wikipedia_button">Read more on Wikipedia</string>
+    <string name="link_error">Can\'t load link</string>
+
+    <!-- Breed list screen -->
+    <string name="network_error_snackbar">A network error has occurred</string>
+    <string name="search_error">Could not find any breeds matching your criteria.</string>
+    <string name="fetch_list_error">There was an error fetching the list.</string>
+    <string name="retry_button">Try again</string>
+    <string name="origin_key">Origin: %1$s</string>
+    <string name="temperament_key">Temperament: %1$s</string>
+    <string name="breed_search_field">Search breed</string>
+
     <!-- Settings screen -->
     <string name="settings_title">Settings</string>
     <string name="mode_light">Light</string>
